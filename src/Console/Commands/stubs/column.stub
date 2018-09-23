@@ -1,0 +1,19 @@
+<?php
+
+namespace DummyNamespace;
+
+use GraphQL\Type\Definition\Type;
+use GraphQL;
+
+class DummyClass
+{
+	protected $attributes = [
+		'name' => 'DummyColumn',
+		'description' => 'A column'
+	];
+
+    public function columns()
+    {
+    	return DummyColumns;
+    }
+}
