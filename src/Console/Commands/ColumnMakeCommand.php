@@ -105,28 +105,4 @@ class ColumnMakeCommand extends GeneratorCommand
         return $stub;
     }
 
-    /**
-     * 根据表字段获取graphql字段
-     *
-     * @param string $table
-     * @param Column $tableColumn
-     *
-     * @return array
-     */
-    protected function getGraphQLField($table, Column $tableColumn)
-    {
-        $column_type  = $this->getColumnType($tableColumn);
-        $graphql_type = $this->getGraphQlTypeByColumn($table, $tableColumn);
-
-        if ($graphql_type === '' || in_array($column_type, $this->columnTypeToGraphQLType['custom'])) {
-            $graphql_type = '[]';
-        }
-
-        return [
-            $this->getColumnName($tableColumn) => [
-                'type'        => $graphql_type,
-                'description' => $this->getCommentByColumn($tableColumn),
-            ],
-        ];
-    }
 }

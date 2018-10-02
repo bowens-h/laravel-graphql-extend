@@ -8,6 +8,8 @@
 
 namespace BowensH\LaravelGraphQLExtend\Console\Commands\Trail;
 
+use Doctrine\DBAL\Schema\Column;
+
 trait GraphQLFieldsTrait
 {
     use TableInfoTrait;
@@ -45,7 +47,7 @@ EOF;
      *
      * @return array
      */
-    private function getGraphQLFields($table)
+    private function getGraphQLFields(string $table)
     {
         $graphql_fields = [];
 
@@ -56,6 +58,24 @@ EOF;
         }
 
         return $graphql_fields;
+    }
+
+    /**
+     * 根据表字段获取graphql字段
+     *
+     * @param string $table
+     * @param Column $tableColumn
+     *
+     * @return array
+     */
+    private function getGraphQLField(string $table, Column $tableColumn)
+    {
+        return [
+            $this->getColumnName($tableColumn) => [
+                'type'        => $this->getGraphQlTypeByColumn($table, $tableColumn),
+                'description' => $this->getCommentByColumn($tableColumn),
+            ],
+        ];
     }
 
 }

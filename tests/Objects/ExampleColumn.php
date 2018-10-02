@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\Type;
 class ExampleColumn
 {
 
-    protected $attributes = [
+    public $attributes = [
         'name' => 'ExampleColumn',
         'description' => 'A example column'
     ];
@@ -28,6 +28,10 @@ class ExampleColumn
                     'url'   => [
                         'type'        => Type::string(),
                         'description' => '图片路径',
+                    ],
+                    'name'   => [
+                        'type'        => Type::string(),
+                        'description' => '图片名',
                     ],
                 ],
                 'description' => '图片',

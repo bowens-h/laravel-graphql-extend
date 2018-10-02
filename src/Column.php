@@ -34,7 +34,7 @@ class Column
         $this->columnClass = new $column_class();
         $this->inputObject = $inputObject;
         $this->columns     = $this->columnClass->columns();
-        $this->name        = $this->columnClass->name();
+        $this->name        = $this->columnClass->getName();
         $this->random      = $this->getRandom();
         self::$randoms[]   = $this->random;
     }
@@ -54,20 +54,15 @@ class Column
     }
 
     /**
-     * 二维字段的type名称不能重复，故而生成一个随机数
+     * 输出结果
      *
-     * @return int
-     * @throws \Exception
+     * @return null
      */
-    private function getRandom()
+    public function result()
     {
-        $random = random_int(0, 999);
+        $this->filterInput();
 
-        if (in_array($random, self::$randoms)) {
-            $random = $this->getRandom();
-        }
-
-        return $random;
+        return $this->columns;
     }
 
     /**
@@ -105,26 +100,30 @@ class Column
     }
 
     /**
-     * 必填一个字段，进行多维数组递归
+     * 保留的字段
      *
-     * @param $column_name
-     * @param $columns
+     * @param string|array $column_names 要排除的字段，支持字符串、数组，多维请用「点」符号链接
+     *
+     * @return $this
      */
-    private function nonNullOne($column_name, &$columns)
+    public function only($column_names)
     {
-        //截取第一个点，及以后所有
-        $column_names = explode('.', $column_name, 2);
-
-        foreach ($columns as $key => &$column) {
-            if ($column_names[0] == $key) {
-                //如果排除的数组大于1，则说明要排除的是一个多维数组
-                if (count($column_names) > 1) {
-                    $this->nonNullOne($column_names[1], $column['type']);
-                } else {
-                    $column['type'] = Type::nonNull($column['type']);
-                }
-            }
+        if (is_string($column_names)) {
+            $column_names = [ $column_names ];
         }
+
+        //将字段数组转换为只有键的数组
+        $keys = $this->columnsToKeys($this->columns);
+
+        //将需要保留的字段排除掉
+        foreach ($column_names as $column_name) {
+            array_forget($keys, $column_name);
+        }
+
+        //将剩余的键删掉
+        $this->except(array_keys(array_dot($keys)));
+
+        return $this;
     }
 
     /**
@@ -145,6 +144,29 @@ class Column
         }
 
         return $this;
+    }
+
+    /**
+     * 必填一个字段，进行多维数组递归
+     *
+     * @param $column_name
+     * @param $columns
+     */
+    private function nonNullOne($column_name, &$columns)
+    {
+        //截取第一个点，及以后所有
+        $column_names = explode('.', $column_name, 2);
+
+        foreach ($columns as $key => &$column) {
+            if ($column_names[0] == $key) {
+                //如果排除的数组大于1，则说明要排除的是一个多维数组
+                if (count($column_names) > 1) {
+                    $this->nonNullOne($column_names[1], $column['type']);
+                } else {
+                    $column['type'] = Type::nonNull($column['type']);
+                }
+            }
+        }
     }
 
     /**
@@ -173,33 +195,6 @@ class Column
                 }
             }
         }
-    }
-
-    /**
-     * 保留的字段
-     *
-     * @param string|array $column_names 要排除的字段，支持字符串、数组，多维请用「点」符号链接
-     *
-     * @return $this
-     */
-    public function only($column_names)
-    {
-        if (is_string($column_names)) {
-            $column_names = [ $column_names ];
-        }
-
-        //将字段数组转换为只有键的数组
-        $keys = $this->columnsToKeys($this->columns);
-
-        //将需要保留的字段排除掉
-        foreach ($column_names as $column_name) {
-            array_forget($keys, $column_name);
-        }
-
-        //将剩余的键删掉
-        $this->except(array_keys(array_dot($keys)));
-
-        return $this;
     }
 
     /**
@@ -248,14 +243,19 @@ class Column
     }
 
     /**
-     * 输出结果
+     * 二维字段的type名称不能重复，故而生成一个随机数
      *
-     * @return null
+     * @return int
+     * @throws \Exception
      */
-    public function result()
+    private function getRandom()
     {
-        $this->filterInput();
+        $random = random_int(0, 999);
 
-        return $this->columns;
+        if (in_array($random, self::$randoms)) {
+            $random = $this->getRandom();
+        }
+
+        return $random;
     }
 }

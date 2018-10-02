@@ -12,18 +12,6 @@ use Doctrine\DBAL\Schema\Column;
 
 trait TableInfoTrait
 {
-
-    /**
-     * 表字段与graphql字段的映射，如果没有定义统一指向 Type::string()
-     */
-    private $columnTypeToGraphQLType = [
-        'Type::int()'     => [ 'Integer', 'SmallInt', 'BigInt' ],
-        'Type::float()'   => [ 'Float', 'Decimal' ],
-        'Type::boolean()' => [ 'Boolean' ],
-        'Type::string()'  => [],
-        'custom'          => [ 'Json' ]//自定义的特殊类型
-    ];
-
     /**
      * 获取表的所有字段
      *
@@ -54,23 +42,20 @@ trait TableInfoTrait
      */
     private function getGraphQlTypeByColumn(string $table, Column $tableColumn)
     {
-        $type        = '';
+        $type_map    = config('graphql_extend.type_map');
+        $type        = $type_map['default'] ?? 'Type::string()';
+        $common      = $type_map['common'] ?? [];
         $column_type = $tableColumn->getType();
-        $column_name = $tableColumn->getName();
 
-        foreach ($this->columnTypeToGraphQLType as $graphql_type => $column_types) {
-            if ($graphql_type == 'custom' && in_array($column_type, $column_types)) {
-                if ($column_type == 'Json') {
-                    $type = '\GraphQL::type(\''.title_case($table).title_case($column_name).'Type\')';
-                }
-            } else {
-                if ($column_name == 'id') {
-                    $type = 'Type::ID()';
-                } elseif (in_array($column_type, $column_types)) {
-                    $type = $graphql_type;
-                } else {
-                    $type = 'Type::string()';
-                }
+        //$column_name = $tableColumn->getName();
+        //
+        //if ($column_type == 'Json') {
+        //    $type = '\GraphQL::type(\''.title_case($table).title_case($column_name).'Type\')';
+        //}
+
+        foreach ($common as $graphql_type => $column_types) {
+            if (in_array($column_type, $column_types)) {
+                $type = $graphql_type;
             }
         }
 
