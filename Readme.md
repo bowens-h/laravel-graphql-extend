@@ -102,7 +102,7 @@ php artisan make:graphql:type TestType --table=Test
 - [nonNull](#nonNull)
 - [result](#result)
 
-> Column 类最后输出的解决，专用于 Type 类型的 fields 方法中。
+> Column 类最后输出的结果，专用于 Type 类型的 fields 方法中。
 
 #### make
 
@@ -155,11 +155,29 @@ Column::make(TestColumn::class, true)->nonNull(['title'])
 输出最终结果。
 
 ```php
-public function fields()
+<?php
+
+namespace App\GraphQL\Type\Clothes;
+
+use App\GraphQL\Columns\TestColumn;
+use BowensH\LaravelGraphQLExtend\Column;
+use Folklore\GraphQL\Support\Type as BaseType;
+
+class TestType extends BaseType
 {
-    return Column::make(ClothesColumn::class, true) // 根据 ClothesColumn 生成 Column 实例
-        ->nonNull(['title']) // 可选，配置 title 字段为 nonNull
-        ->except(['id']) // 可选，排除 id 字段
-        ->result(); // 返回最终结果
+    protected $inputObject = true;
+    
+    protected $attributes = [
+        'name' => 'TestType',
+        'description' => '测试'
+    ];
+
+    public function fields()
+    {
+        return Column::make(TestColumn::class, true) // 根据 ClothesColumn 生成 Column 实例
+            ->nonNull(['title']) // 可选，配置 title 字段为 nonNull
+            ->except(['id']) // 可选，排除 id 字段
+            ->result(); // 返回最终结果
+    }
 }
 ```
