@@ -37,5 +37,6 @@
                 "BowensH\\LaravelGraphQLExtend\\ServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev"
 }

@@ -2,10 +2,11 @@
 
 namespace DummyNamespace;
 
+use BowensH\LaravelGraphQLExtend\BaseColumn;
 use GraphQL\Type\Definition\Type;
 use GraphQL;
 
-class DummyClass
+class DummyClass extends BaseColumn
 {
 	protected $attributes = [
 		'name' => 'DummyColumn',
