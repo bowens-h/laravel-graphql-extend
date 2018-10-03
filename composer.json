@@ -4,7 +4,8 @@
     "license": "MIT",
     "keywords": [
         "laravel",
-        "graphql"
+        "graphql",
+        "php"
     ],
     "authors": [
         {
