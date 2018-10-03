@@ -80,7 +80,7 @@ php artisan make:graphql:column TestColumn --table=test --force
 在 folklore/graphql 包的原命令基础上，增加了 「--table=」 参数，可以根据表生成对应字段，当 Type 类型文件中的字段不需要复用时，可以使用这个命令快速根据表生成字段。
 
 ```php
-php artisan make:graphql:type TestType --table=Test
+php artisan make:graphql:type TestType --table=test --force
 ```
 
 ## 用法
@@ -131,7 +131,9 @@ Column::make(TestColumn::class)
 只保留 TestColumn 中的 id 字段。
 
 ```php
+//支持字符串与数组
 Column::make(TestColumn::class, true)->only(['id'])
+Column::make(TestColumn::class, true)->only('id')
 ```
 
 #### except
@@ -139,15 +141,19 @@ Column::make(TestColumn::class, true)->only(['id'])
 排除 TestColumn 中的 id 字段。
 
 ```php
+//支持字符串与数组
 Column::make(TestColumn::class, true)->except(['id'])
+Column::make(TestColumn::class, true)->except('id')
 ```
 
 #### nonNull
 
-将 TestColumn 中的 某些字段设置为 Type::nonNull，支持 字符串 与 数组。
+将 TestColumn 中的 某些字段设置为 Type::nonNull。
 
 ```php
+//支持字符串与数组
 Column::make(TestColumn::class, true)->nonNull(['title'])
+Column::make(TestColumn::class, true)->nonNull('title')
 ```
 
 #### result
