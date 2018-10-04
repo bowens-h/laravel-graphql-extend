@@ -60,7 +60,7 @@ class Column
      */
     public function result()
     {
-        $this->filterInput();
+        $this->filterArray();
 
         return $this->columns;
     }
@@ -159,9 +159,13 @@ class Column
 
         foreach ($columns as $key => &$column) {
             if ($column_names[0] == $key) {
-                //如果排除的数组大于1，则说明要排除的是一个多维数组
+                //如果大于1，则说明是一个多维数组
                 if (count($column_names) > 1) {
-                    $this->nonNullOne($column_names[1], $column['type']);
+                    if (isset($column['type'][0])) {
+                        $this->nonNullOne($column_names[1], $column['type'][0]);
+                    } else {
+                        $this->nonNullOne($column_names[1], $column['type']);
+                    }
                 } else {
                     $column['type'] = Type::nonNull($column['type']);
                 }
@@ -184,11 +188,20 @@ class Column
             if ($column_names[0] == $key) {
                 //如果排除的数组大于1，则说明要排除的是一个多维数组
                 if (count($column_names) > 1) {
-                    $this->exceptOne($column_names[1], $column['type']);
+                    if (isset($column['type'][0])) {
+                        $this->exceptOne($column_names[1], $column['type'][0]);
 
-                    //如果多维数据中已不存在元素，则将该字段删除
-                    if (count($column['type']) == 0) {
-                        unset($columns[$key]);
+                        //如果多维数据中已不存在元素，则将该字段删除
+                        if (count($column['type'][0]) === 0) {
+                            unset($columns[$key]);
+                        }
+                    } else {
+                        $this->exceptOne($column_names[1], $column['type']);
+
+                        //如果多维数据中已不存在元素，则将该字段删除
+                        if (count($column['type']) === 0) {
+                            unset($columns[$key]);
+                        }
                     }
                 } else {
                     unset($columns[$key]);
@@ -210,7 +223,9 @@ class Column
 
         foreach ($columns as $key => $column) {
             if (is_array($column['type'])) {
-                $keys[$key] = $this->columnsToKeys($column['type']);
+                //将 数组类型 转为 一般类型
+                $type       = isset($column['type'][0]) ? $column['type'][0] : $column['type'];
+                $keys[$key] = $this->columnsToKeys($type);
             } else {
                 //到了最里层，将键赋值为1，占位，没什么意义
                 $keys[$key] = 1;
@@ -221,22 +236,34 @@ class Column
     }
 
     /**
-     * 分拣input类型
+     * 分拣 array 类型
      */
-    private function filterInput()
+    private function filterArray()
     {
         foreach ($this->columns as $key => &$column) {
             if (is_array($column['type'])) {
-                if ($this->inputObject) {
-                    $column['type'] = new InputObjectType([
+                if (isset($column['type'][0])) {//json 数据为数组
+                    $data = [
+                        'name'   => $key.'_'.$this->random,
+                        'fields' => $column['type'][0]
+                    ];
+
+                    if ($this->inputObject) {
+                        $column['type'] = Type::listOf(new InputObjectType($data));
+                    } else {
+                        $column['type'] = Type::listOf(new ObjectType($data));
+                    }
+                } else {//json 数据为键值
+                    $data = [
                         'name'   => $key.'_'.$this->random,
                         'fields' => $column['type']
-                    ]);
-                } else {
-                    $column['type'] = new ObjectType([
-                        'name'   => $key.'_'.$this->random,
-                        'fields' => $column['type']
-                    ]);
+                    ];
+
+                    if ($this->inputObject) {
+                        $column['type'] = new InputObjectType($data);
+                    } else {
+                        $column['type'] = new ObjectType($data);
+                    }
                 }
             }
         }
