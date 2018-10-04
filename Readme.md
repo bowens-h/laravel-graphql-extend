@@ -1,6 +1,6 @@
 # Laravel GraphQL Extend
 
-folklore/graphql 包的功能扩展。扩展功能如下：
+Folkloreatelier/laravel-graphql 包的功能扩展。扩展功能如下：
 1. 新增 Column 类型文件，用于映射数据表字段，输出的数据可以被 Type 类型文件的 fields 方法使用，主要避免数据表字段的重复定义；
 2. Type 类型文件的 fields 方法中字段可以根据表字段自动生成；
 
@@ -10,8 +10,9 @@ folklore/graphql 包的功能扩展。扩展功能如下：
 
 * [Laravel 5.x](https://github.com/laravel/laravel)
 * [laravel graphql 1.*](https://github.com/Folkloreatelier/laravel-graphql)
+* [doctrine dbal >=2.6](https://github.com/doctrine/dbal)
 
-**1-** [安装 folklore/graphql 包](https://github.com/Folkloreatelier/laravel-graphql)
+**1-** [安装 Folkloreatelier/laravel-graphql 包](https://github.com/Folkloreatelier/laravel-graphql)
 
 **2-** `composer.json` 添加包
 
@@ -74,6 +75,40 @@ config/graphql_extend.php
 php artisan make:graphql:column TestColumn --table=test --force
 ```
 
+如果某表字段为 json 类型，则该字段的 type 属性 命令默认生成为空数组（[]），需要自己手动写入对应键值，如果是数组，请用中括号包裹。例如
+
+```php
+public function columns()
+{
+    return [
+        'test' => [
+            'name'  => [
+                'type'        => Type::string(),
+                'description' => '类型',
+            ]
+        ],
+        'description' => '测试',
+    ];
+}
+```
+
+```php
+public function columns()
+{
+    return [
+        'test' => [
+            [//数组类型
+                'name'  => [
+                    'type'        => Type::string(),
+                    'description' => '类型',
+                ]
+            ]
+        ],
+        'description' => '测试',
+    ];
+}
+```
+
 <a name="make-type"></a>
 #### Type 类型文件生成命令
 
@@ -92,6 +127,8 @@ php artisan make:graphql:type TestType --table=test --force
 ### 配置
 
 - type_map: 数据表字段类型与 GraphQL 的类型映射。
+
+> doctrine/dbal 包自动识别 mysql 中的 TinyInt 类型为 Boolean，因此该类型对应 graphql 类型为 Type::boolean()。
 
 ### Column
 
