@@ -19,7 +19,7 @@ Folkloreatelier/laravel-graphql 包的功能扩展。扩展功能如下：
 ```json
 {
   "require": {
-    "bowens-h/laravel-graphql-extent": "~0.1.0"
+    "bowens-h/laravel-graphql-extent": "~1.0.0"
   }
 }
 ```
