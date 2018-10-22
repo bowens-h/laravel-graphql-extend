@@ -6,7 +6,7 @@
  * Time: 14:17
  */
 
-namespace BowensH\LaravelGraphQLExtend\Console\Commands\Trail;
+namespace BowensH\LaravelGraphQLExtend\Console\Commands\Traits;
 
 use Doctrine\DBAL\Schema\Column;
 

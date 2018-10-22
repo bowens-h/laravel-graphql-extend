@@ -2,7 +2,7 @@
 
 namespace BowensH\LaravelGraphQLExtend\Console\Commands;
 
-use BowensH\LaravelGraphQLExtend\Console\Commands\Trail\GraphQLFieldsTrait;
+use BowensH\LaravelGraphQLExtend\Console\Commands\Traits\GraphQLFieldsTrait;
 use Doctrine\DBAL\Schema\Column;
 use Folklore\GraphQL\Console\TypeMakeCommand as BaseTypeMakeCommand;
 
